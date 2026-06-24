@@ -166,7 +166,7 @@ case "$EVENT" in
     ;;
 
   preToolUse)
-    if [[ "$(get_config '.behavior.notify_on_file_tools' 'true')" == "true" ]]; then
+    if [[ "$(get_config '.behavior.notify_on_file_tools' 'false')" == "true" ]]; then
       TOOL="$(echo "$INPUT" | jq -r '.tool_name // empty' 2>/dev/null || true)"
       case "$TOOL" in
         ApplyPatch)
@@ -179,7 +179,7 @@ case "$EVENT" in
 
   beforeShellExecution)
     COMMAND="$(echo "$INPUT" | jq -r '.command // empty' 2>/dev/null || true)"
-    if [[ "$(get_config '.behavior.notify_on_shell_approval' 'true')" == "true" ]] && [[ -n "$COMMAND" ]]; then
+    if [[ "$(get_config '.behavior.notify_on_shell_approval' 'false')" == "true" ]] && [[ -n "$COMMAND" ]]; then
       if ! matches_patterns "$COMMAND" '.behavior.shell_skip_notify_patterns'; then
         notify_approval "$(truncate_detail "$COMMAND")"
       fi
@@ -188,7 +188,7 @@ case "$EVENT" in
     ;;
 
   beforeMCPExecution)
-    if [[ "$(get_config '.behavior.notify_on_mcp_approval' 'true')" == "true" ]]; then
+    if [[ "$(get_config '.behavior.notify_on_mcp_approval' 'false')" == "true" ]]; then
       MCP_TOOL="$(echo "$INPUT" | jq -r '.tool_name // "MCP tool"' 2>/dev/null || echo "MCP tool")"
       notify_approval "$(truncate_detail "$MCP_TOOL")"
     fi

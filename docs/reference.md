@@ -45,9 +45,9 @@ Approval Ping strategy: `ApplyPatch` via `preToolUse`; shell skips read-only pat
 | `behavior.play_on_stop` | bool | true | |
 | `behavior.play_on_subagent_stop` | bool | true | |
 | `behavior.play_on_session_start` | bool | false | |
-| `behavior.notify_on_file_tools` | bool | true | Ping on `ApplyPatch` |
-| `behavior.notify_on_shell_approval` | bool | true | Ping on shell unless `shell_skip_notify_patterns` matches |
-| `behavior.notify_on_mcp_approval` | bool | true | Ping on MCP calls |
+| `behavior.notify_on_file_tools` | bool | false | Ping on `ApplyPatch` |
+| `behavior.notify_on_shell_approval` | bool | false | Ping on shell unless `shell_skip_notify_patterns` matches |
+| `behavior.notify_on_mcp_approval` | bool | false | Ping on MCP calls |
 | `behavior.notify_cooldown_seconds` | number | 5 | Debounce duplicate alerts |
 | `behavior.shell_skip_notify_patterns` | string[] | see example | Read-only shell commands — no Ping |
 

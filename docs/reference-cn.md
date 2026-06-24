@@ -45,9 +45,9 @@
 | `behavior.play_on_stop` | bool | true | |
 | `behavior.play_on_subagent_stop` | bool | true | |
 | `behavior.play_on_session_start` | bool | false | |
-| `behavior.notify_on_file_tools` | bool | true | `ApplyPatch` 时 Ping |
-| `behavior.notify_on_shell_approval` | bool | true | shell 未命中 skip 模式时 Ping |
-| `behavior.notify_on_mcp_approval` | bool | true | MCP 调用 Ping |
+| `behavior.notify_on_file_tools` | bool | false | `ApplyPatch` 时 Ping |
+| `behavior.notify_on_shell_approval` | bool | false | shell 未命中 skip 模式时 Ping |
+| `behavior.notify_on_mcp_approval` | bool | false | MCP 调用 Ping |
 | `behavior.notify_cooldown_seconds` | number | 5 | 防重复响 |
 | `behavior.shell_skip_notify_patterns` | string[] | 见 example | 只读 shell — 不 Ping |
 

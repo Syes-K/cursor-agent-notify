@@ -22,9 +22,9 @@
     "play_on_stop": true,
     "play_on_subagent_stop": true,
     "play_on_session_start": false,
-    "notify_on_file_tools": true,
-    "notify_on_shell_approval": true,
-    "notify_on_mcp_approval": true,
+    "notify_on_file_tools": false,
+    "notify_on_shell_approval": false,
+    "notify_on_mcp_approval": false,
     "notify_cooldown_seconds": 5,
     "shell_skip_notify_patterns": [
       "^git (status|diff|log|show|branch|rev-parse|remote -v)\\b",

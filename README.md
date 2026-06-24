@@ -63,9 +63,9 @@ Edit `~/.cursor/hooks/notify-config.json` (copy from `notify-config.example.json
     "group_id": "cursor-agent"
   },
   "behavior": {
-    "notify_on_file_tools": true,
-    "notify_on_shell_approval": true,
-    "notify_on_mcp_approval": true,
+    "notify_on_file_tools": false,
+    "notify_on_shell_approval": false,
+    "notify_on_mcp_approval": false,
     "play_on_stop": true
   }
 }
