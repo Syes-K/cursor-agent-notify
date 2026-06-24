@@ -20,6 +20,26 @@ get_config() {
   fi
 }
 
+matches_patterns() {
+  local text="$1"
+  local jq_path="$2"
+  local pattern
+  [[ -f "$CONFIG" ]] || return 1
+  while IFS= read -r pattern; do
+    [[ -z "$pattern" ]] && continue
+    if echo "$text" | grep -qE "$pattern"; then
+      return 0
+    fi
+  done < <(jq -r "${jq_path}[]? // empty" "$CONFIG" 2>/dev/null)
+  return 1
+}
+
+truncate_detail() {
+  local detail="$1"
+  [[ ${#detail} -gt 72 ]] && detail="${detail:0:72}…"
+  echo "$detail"
+}
+
 play_sound() {
   local sound_path="$1"
   [[ -z "$sound_path" || "$sound_path" == "null" ]] && return 0
@@ -102,7 +122,7 @@ notify_approval() {
     return 0
   fi
   local template
-  template="$(get_config '.notifications.messages.approval_needed' '需要你的批准才能继续')"
+  template="$(get_config '.notifications.messages.approval_needed' 'Your approval is needed to continue')"
   if [[ -n "$detail" ]]; then
     notify_state "approval" "approval_needed" "approval_needed" "${template} — ${detail}"
   else
@@ -146,57 +166,31 @@ case "$EVENT" in
     ;;
 
   preToolUse)
-    if [[ "$(get_config '.behavior.notify_on_tool_approval' 'true')" == "true" ]]; then
+    if [[ "$(get_config '.behavior.notify_on_file_tools' 'true')" == "true" ]]; then
       TOOL="$(echo "$INPUT" | jq -r '.tool_name // empty' 2>/dev/null || true)"
-      DETAIL=""
       case "$TOOL" in
-        Write|StrReplace|Delete|EditNotebook|ApplyPatch)
-          DETAIL="$TOOL"
-          ;;
-        Task)
-          DETAIL="Subagent task"
+        ApplyPatch)
+          notify_approval "$TOOL"
           ;;
       esac
-      if [[ -n "$DETAIL" ]]; then
-        notify_approval "$DETAIL"
-      fi
     fi
     echo '{"permission":"allow"}'
     ;;
 
   beforeShellExecution)
     COMMAND="$(echo "$INPUT" | jq -r '.command // empty' 2>/dev/null || true)"
-    if [[ "$(get_config '.behavior.notify_on_tool_approval' 'true')" == "true" ]]; then
-      SHORT_CMD="$COMMAND"
-      [[ ${#SHORT_CMD} -gt 72 ]] && SHORT_CMD="${SHORT_CMD:0:72}…"
-      notify_approval "$SHORT_CMD"
-    elif [[ "$(get_config '.behavior.notify_on_shell_approval' 'false')" == "true" ]] && [[ -f "$CONFIG" ]]; then
-      NEEDS_ASK=false
-      while IFS= read -r pattern; do
-        [[ -z "$pattern" ]] && continue
-        if echo "$COMMAND" | grep -qE "$pattern"; then
-          NEEDS_ASK=true
-          break
-        fi
-      done < <(jq -r '.behavior.shell_approval_patterns[]? // empty' "$CONFIG" 2>/dev/null)
-      if [[ "$NEEDS_ASK" == "true" ]]; then
-        notify_approval "$COMMAND"
-        jq -n \
-          --arg cmd "$COMMAND" \
-          '{
-            permission: "ask",
-            user_message: ("Shell command needs your approval: " + $cmd)
-          }'
-        exit 0
+    if [[ "$(get_config '.behavior.notify_on_shell_approval' 'true')" == "true" ]] && [[ -n "$COMMAND" ]]; then
+      if ! matches_patterns "$COMMAND" '.behavior.shell_skip_notify_patterns'; then
+        notify_approval "$(truncate_detail "$COMMAND")"
       fi
     fi
     echo '{"permission":"allow"}'
     ;;
 
   beforeMCPExecution)
-    if [[ "$(get_config '.behavior.notify_on_tool_approval' 'true')" == "true" ]]; then
+    if [[ "$(get_config '.behavior.notify_on_mcp_approval' 'true')" == "true" ]]; then
       MCP_TOOL="$(echo "$INPUT" | jq -r '.tool_name // "MCP tool"' 2>/dev/null || echo "MCP tool")"
-      notify_approval "$MCP_TOOL"
+      notify_approval "$(truncate_detail "$MCP_TOOL")"
     fi
     echo '{"permission":"allow"}'
     ;;

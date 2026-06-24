@@ -14,7 +14,7 @@
     "preToolUse": [
       {
         "command": "./hooks/agent-notify.sh",
-        "matcher": "Write|StrReplace|Delete|EditNotebook|ApplyPatch|Task"
+        "matcher": "ApplyPatch"
       }
     ],
     "beforeShellExecution": [

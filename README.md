@@ -9,7 +9,7 @@ Uses [Cursor Hooks](https://cursor.com/docs/agent/hooks) + [`terminal-notifier`]
 | Event | When | Sound (default) |
 |-------|------|-----------------|
 | Agent turn done | `stop` completed | Glass |
-| Needs Accept / Blocked | Shell, Write, MCP approval | Ping |
+| Needs Accept / Blocked | ApplyPatch, shell (non-readonly), MCP | Ping |
 | Agent error | `stop` error/aborted | Basso |
 | Subagent done | `subagentStop` | Pop |
 
@@ -63,13 +63,36 @@ Edit `~/.cursor/hooks/notify-config.json` (copy from `notify-config.example.json
     "group_id": "cursor-agent"
   },
   "behavior": {
-    "notify_on_tool_approval": true,
+    "notify_on_file_tools": true,
+    "notify_on_shell_approval": true,
+    "notify_on_mcp_approval": true,
     "play_on_stop": true
   }
 }
 ```
 
 See [docs/reference.md](docs/reference.md) for all options.
+
+### Approval notifications (Ping)
+
+Cursor has no hook for “already blocked”. We approximate your intent:
+
+| Category | When it Pings | Hook |
+|----------|----------------|------|
+| **ApplyPatch** | Multi-file patch (unified diff) | `preToolUse` + matcher |
+| **Shell** | Commands that don’t match `shell_skip_notify_patterns` (read-only / status checks are skipped) | `beforeShellExecution` |
+| **MCP** | Every MCP call (usually needs Accept) | `beforeMCPExecution` |
+
+`Grep`, `Glob`, `Task`, `SemanticSearch`, etc. are **not** notified on use.
+
+Auto-approved file edits or allowlisted shell commands may still Ping — hooks fire **before** Cursor decides. Tune `shell_skip_notify_patterns` in `notify-config.json` if a safe command still alerts.
+
+```json
+"preToolUse": [{
+  "command": "./hooks/agent-notify.sh",
+  "matcher": "ApplyPatch"
+}]
+```
 
 ## Uninstall
 
@@ -95,7 +118,7 @@ cursor-agent-notify/
 
 ## Limitations
 
-- No dedicated hook for “already blocked” — we notify **before** the Accept UI via `beforeShellExecution` / `preToolUse`
+- No dedicated hook for “already blocked” — `ApplyPatch` always Pings; shell uses skip patterns to approximate “needs confirmation”; MCP always Pings
 - First **Allow hooks/** must be clicked in Cursor (chicken-and-egg)
 - `stop` + `completed` covers both “done” and “waiting for your reply”
 - Cloud Agents may not support `stop` hooks

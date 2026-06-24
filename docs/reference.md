@@ -16,7 +16,7 @@ User-level path: `~/.cursor/hooks.json` (relative paths resolve from `~/.cursor/
     "subagentStop": [{ "command": "./hooks/agent-notify.sh" }],
     "preToolUse": [{
       "command": "./hooks/agent-notify.sh",
-      "matcher": "Write|StrReplace|Delete|EditNotebook|ApplyPatch|Task"
+      "matcher": "ApplyPatch"
     }],
     "beforeShellExecution": [{ "command": "./hooks/agent-notify.sh" }],
     "beforeMCPExecution": [{ "command": "./hooks/agent-notify.sh" }]
@@ -25,6 +25,8 @@ User-level path: `~/.cursor/hooks.json` (relative paths resolve from `~/.cursor/
 ```
 
 Optional: add `sessionStart` under `hooks` and set `play_on_session_start: true` in the config.
+
+Approval Ping strategy: `ApplyPatch` via `preToolUse`; shell skips read-only patterns; MCP via `beforeMCPExecution`. `Write`, `StrReplace`, `Grep`, `Task`, etc. are not hooked.
 
 ## notify-config.json fields
 
@@ -43,10 +45,11 @@ Optional: add `sessionStart` under `hooks` and set `play_on_session_start: true`
 | `behavior.play_on_stop` | bool | true | |
 | `behavior.play_on_subagent_stop` | bool | true | |
 | `behavior.play_on_session_start` | bool | false | |
-| `behavior.notify_on_tool_approval` | bool | true | Blocked / Accept reminder |
-| `behavior.notify_cooldown_seconds` | number | 3 | Debounce duplicate alerts |
-| `behavior.notify_on_shell_approval` | bool | false | Legacy: match risky commands and `ask` |
-| `behavior.shell_approval_patterns` | string[] | see example | Used with the option above |
+| `behavior.notify_on_file_tools` | bool | true | Ping on `ApplyPatch` |
+| `behavior.notify_on_shell_approval` | bool | true | Ping on shell unless `shell_skip_notify_patterns` matches |
+| `behavior.notify_on_mcp_approval` | bool | true | Ping on MCP calls |
+| `behavior.notify_cooldown_seconds` | number | 5 | Debounce duplicate alerts |
+| `behavior.shell_skip_notify_patterns` | string[] | see example | Read-only shell commands — no Ping |
 
 Set `CURSOR_NOTIFY_CONFIG` to override the config file path.
 
@@ -81,9 +84,9 @@ terminal-notifier -list ALL
 | No response at all | Hooks loaded? `chmod +x agent-notify.sh` |
 | Sound but no notification | System notification permission; terminal-notifier alerts enabled |
 | Click does not return to Cursor | `which terminal-notifier`; `activate_on_click` |
-| Too many notifications | `notify_on_tool_approval: false` or increase cooldown |
+| Too many notifications | Add patterns to `shell_skip_notify_patterns`; set `notify_on_mcp_approval: false` |
 | Hook reports invalid JSON | Script must end with valid JSON (`{}` or `permission`) |
-| No sound on first Blocked | Click **Allow hooks/** to trust `~/.cursor/hooks/` first |
+| No Ping on Blocked | `preToolUse` matcher + `notify_on_file_tools: true`? |
 
 ## Development & release
 

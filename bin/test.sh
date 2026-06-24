@@ -21,14 +21,18 @@ case "${1:-complete}" in
     ;;
   approval|blocked|shell)
     echo '{"hook_event_name":"beforeShellExecution","command":"git commit -m test"}' | "$SCRIPT"
-    echo "Sent: approval needed (Ping)"
+    echo "Sent: shell approval needed (Ping)"
+    ;;
+  file|write|patch)
+    echo '{"hook_event_name":"preToolUse","tool_name":"ApplyPatch"}' | "$SCRIPT"
+    echo "Sent: ApplyPatch approval (Ping)"
     ;;
   subagent)
     echo '{"hook_event_name":"subagentStop","status":"completed"}' | "$SCRIPT"
     echo "Sent: subagent complete (Pop)"
     ;;
   *)
-    echo "Usage: $0 {complete|error|approval|subagent}"
+    echo "Usage: $0 {complete|error|approval|file|subagent}"
     exit 1
     ;;
 esac

@@ -16,7 +16,7 @@
     "subagentStop": [{ "command": "./hooks/agent-notify.sh" }],
     "preToolUse": [{
       "command": "./hooks/agent-notify.sh",
-      "matcher": "Write|StrReplace|Delete|EditNotebook|ApplyPatch|Task"
+      "matcher": "ApplyPatch"
     }],
     "beforeShellExecution": [{ "command": "./hooks/agent-notify.sh" }],
     "beforeMCPExecution": [{ "command": "./hooks/agent-notify.sh" }]
@@ -25,6 +25,8 @@
 ```
 
 可选：在 `hooks` 下加 `sessionStart` 并在配置中设 `play_on_session_start: true`。
+
+待确认 Ping：`ApplyPatch` 走 `preToolUse`；shell 跳过 `shell_skip_notify_patterns` 中的只读命令；MCP 走 `beforeMCPExecution`。`Write`、`StrReplace`、`Grep`、`Task` 等不挂钩。
 
 ## notify-config.json 字段
 
@@ -43,10 +45,11 @@
 | `behavior.play_on_stop` | bool | true | |
 | `behavior.play_on_subagent_stop` | bool | true | |
 | `behavior.play_on_session_start` | bool | false | |
-| `behavior.notify_on_tool_approval` | bool | true | Blocked/Accept 提醒 |
-| `behavior.notify_cooldown_seconds` | number | 3 | 防重复响 |
-| `behavior.notify_on_shell_approval` | bool | false | 旧：仅匹配危险命令并 `ask` |
-| `behavior.shell_approval_patterns` | string[] | 见 example | 配合上一项 |
+| `behavior.notify_on_file_tools` | bool | true | `ApplyPatch` 时 Ping |
+| `behavior.notify_on_shell_approval` | bool | true | shell 未命中 skip 模式时 Ping |
+| `behavior.notify_on_mcp_approval` | bool | true | MCP 调用 Ping |
+| `behavior.notify_cooldown_seconds` | number | 5 | 防重复响 |
+| `behavior.shell_skip_notify_patterns` | string[] | 见 example | 只读 shell — 不 Ping |
 
 环境变量 `CURSOR_NOTIFY_CONFIG` 可覆盖配置文件路径。
 
@@ -81,9 +84,9 @@ terminal-notifier -list ALL
 | 无任何反应 | Hooks 是否加载；`chmod +x agent-notify.sh` |
 | 有音效无通知 | 系统通知权限；terminal-notifier 通知开关 |
 | 点击不回 Cursor | `which terminal-notifier`；`activate_on_click` |
-| 通知太频繁 | `notify_on_tool_approval: false` 或调大 cooldown |
+| 通知太频繁 | 往 `shell_skip_notify_patterns` 加规则；或 `notify_on_mcp_approval: false` |
 | Hook 报 invalid JSON | 脚本必须以合法 JSON 结尾（`{}` 或 `permission`） |
-| 首次 Blocked 无响 | 先点 **Allow hooks/** 信任 `~/.cursor/hooks/` |
+| Blocked 无 Ping | `preToolUse` matcher + `notify_on_file_tools: true`？ |
 
 ## 开发与发布
 

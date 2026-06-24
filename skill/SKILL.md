@@ -29,7 +29,7 @@ Install targets: `~/.cursor/hooks/`, `~/.cursor/hooks.json`, `~/.cursor/skills/c
 |-----------------|------------|-------|
 | Agent done, waiting for your reply | `stop` (`completed`) | Glass |
 | Blocked, waiting for Accept | `beforeShellExecution` | Ping |
-| Write / delete / subagent tool | `preToolUse` | Ping |
+| ApplyPatch (multi-file patch) | `preToolUse` | Ping |
 | MCP pending approval | `beforeMCPExecution` | Ping |
 | Subagent finished | `subagentStop` | Pop |
 

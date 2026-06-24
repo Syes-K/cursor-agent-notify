@@ -22,11 +22,18 @@
     "play_on_stop": true,
     "play_on_subagent_stop": true,
     "play_on_session_start": false,
-    "notify_on_tool_approval": true,
-    "notify_cooldown_seconds": 3,
-    "notify_on_shell_approval": false,
-    "shell_approval_patterns": [
-      "curl|wget|git push|git commit|pnpm publish|npm publish|rm -rf|sudo"
+    "notify_on_file_tools": true,
+    "notify_on_shell_approval": true,
+    "notify_on_mcp_approval": true,
+    "notify_cooldown_seconds": 5,
+    "shell_skip_notify_patterns": [
+      "^git (status|diff|log|show|branch|rev-parse|remote -v)\\b",
+      "^(ls|pwd|which|echo|cat|head|tail|wc|file|stat|df|du|date|uname|whoami|id)\\b",
+      "^(rg |grep |find |test |\\[ |true|false)\\b",
+      "^npm (test|run test|run lint|ci)\\b",
+      "^pnpm (test|run test)\\b",
+      "^yarn (test|run test)\\b",
+      "^(jq |cd |printf |env|printenv)\\b"
     ]
   }
 }
