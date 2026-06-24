@@ -1,0 +1,32 @@
+{
+  "sounds": {
+    "agent_turn_complete": "/System/Library/Sounds/Glass.aiff",
+    "agent_error": "/System/Library/Sounds/Basso.aiff",
+    "approval_needed": "/System/Library/Sounds/Ping.aiff",
+    "subagent_complete": "/System/Library/Sounds/Pop.aiff",
+    "session_start": null
+  },
+  "notifications": {
+    "enabled": true,
+    "activate_on_click": true,
+    "app_bundle_id": "com.todesktop.230313mzl4w4u92",
+    "group_id": "cursor-agent",
+    "messages": {
+      "agent_turn_complete": "Agent finished this turn — waiting for your reply",
+      "agent_error": "Agent error or aborted",
+      "approval_needed": "Cursor needs you to click Accept to continue",
+      "subagent_complete": "Background subagent finished"
+    }
+  },
+  "behavior": {
+    "play_on_stop": true,
+    "play_on_subagent_stop": true,
+    "play_on_session_start": false,
+    "notify_on_tool_approval": true,
+    "notify_cooldown_seconds": 3,
+    "notify_on_shell_approval": false,
+    "shell_approval_patterns": [
+      "curl|wget|git push|git commit|pnpm publish|npm publish|rm -rf|sudo"
+    ]
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "hooks": {
+    "stop": [
+      {
+        "command": "./hooks/agent-notify.sh"
+      }
+    ],
+    "subagentStop": [
+      {
+        "command": "./hooks/agent-notify.sh"
+      }
+    ],
+    "preToolUse": [
+      {
+        "command": "./hooks/agent-notify.sh",
+        "matcher": "Write|StrReplace|Delete|EditNotebook|ApplyPatch|Task"
+      }
+    ],
+    "beforeShellExecution": [
+      {
+        "command": "./hooks/agent-notify.sh"
+      }
+    ],
+    "beforeMCPExecution": [
+      {
+        "command": "./hooks/agent-notify.sh"
+      }
+    ]
+  }
+}
